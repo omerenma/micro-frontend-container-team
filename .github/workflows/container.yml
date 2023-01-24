@@ -1,0 +1,34 @@
+# This line of code displays the name of the Github action => deploy-container
+name: deploy-container
+# This lines of code is what listens for event on the repository like push event
+# on the master or main branches
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - 'packages/container/**'
+defaults:
+  run:
+    working-directory: packages/container
+
+# This lines of code does the job of building the production build with webpack
+# It runs on the github virsual machine ubuntu
+# It uses the following steps to install and run the build with npm
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm install
+      - run: npm run build
+        
+# This line is what pushes or deploys the code to AWS S3
+      - uses: chrislennon/action-aws-cli@v1.1
+      - run: aws s3 sync dist s3://${{secrets.AWS_S3_BUCKET_NAME}}/container/latest
+        env:
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          
