@@ -24,6 +24,7 @@ jobs:
 
     - name: Build
       run: |
+        echo "action_state=yellow" >> $GITHUB_ENV
         npm install
         npm run build
         
